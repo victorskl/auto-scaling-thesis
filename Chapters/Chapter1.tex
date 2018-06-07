@@ -1,0 +1,38 @@
+% Chapter 1
+
+\chapter{Introduction} % Main chapter title
+
+\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1} 
+
+%----------------------------------------------------------------------------------------
+
+% Define some commands to keep the formatting separated from the content 
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\tabhead}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{\bfseries#1}}
+\newcommand{\option}[1]{\texttt{\itshape#1}}
+
+%----------------------------------------------------------------------------------------
+
+%\section{Motivation}
+
+\textbf{Motivation:} \quad Today, in software engineering, the rise of Containerisation \parencite{Scheepers2014VirtualizationAC} and Cloud Computing \parencite{Armbrust:2010:VCC:1721654.1721672} technologies have prominently changed the way we deliver the software packaging and deployment. Certainly, the application deployment is not quite like it was in the recent past years -- concepts such as Containerised App \parencite{Merkel:2014:DLL:2600239.2600241}, Infrastructure-as-Code (IaC), DevOps \parencite{httermann2012devops} are some examples in the modern deployment literature. Advances in Virtualization technologies have changed the Operating System (OS) landscape and studies \parencite{Kozhirbayev2017APC} \parencite{5708625} show that container-based virtualizaton are best fit for the application deployment process-level isolation which entail the popular choice for Platform-as-a-Service (PaaS) offering and; whereas hypervisor-based or full virtualization are better for infrastructure level islolation that entail the service provider choice for Infrastructure-as-a-Service (IaaS) model. Nevertheless, it is evident that the rise of virtualization technologies contributed the foundation for the Cloud Computing. One profound benefit of Cloud Computing is giving virtually unlimited number of computing resources and the elasticity to acquire and release of these resources. At the same time, the software development is also taking advancement in more decomposable and serviceable components such as adopting Service-oriented architecture (SOA), Microservices and RESTful architecture. This realises the fundamental of Distributed Systems where it defines as \textit{one in which hardware or software components located at networked computers communicate and coordinate theirs actions only by passing messages} \parencite{Coulouris:2011:DSC:2029110}. [Studies \parencite{Sinnott:2016:SCS:3008079.3008128} shows that a \textbf{Scalable} cloud-based system can build] for such a distributed application deployment onto the Cloud platform. This realisation also gives the indication that we can dynamically scale to meet with on-demands computing needs. The idea of \textbf{Auto-Scaling} system is to give the business:
+
+\begin{enumerate}
+\item to start with the minimal operational computing resource provision at deployment
+\item to scale out the system to meet the usage demands by probing on particular resource metric such as CPU utilisation
+\item to spin down the computing resources to maintain the minimal operational limit when no usage demand is required
+\item to automate this scaling process 1..3 without human operator intervention
+\end{enumerate}
+
+This elastic nature of dynamic scaling gives the business to an operational optimisation which  contribute to streamline costs, increase productivity and improve profitability while maintaining the Service Level Objectives (SLO) and satisfying Quality of Service (QoS).
+\\
+\\
+%\section{Aim and Objective}
+\textbf{Research:} \quad To pursuit the motivation in real world setting, this project investigates the dynamic scaling of the ATHENA software stack. The investigation involves infrastructure-level scaling using OpenStack, and application scaling using Docker Swarm and Kubernetes container orchestration.
+
+%\section{Thesis Structure}
+
+The remainder of the thesis is organised as follows. Chapter 2 explain the ATHENA and the key Domain Driver, Chapter 3 Docker, Chapter 4 discuss the main research on Auto-scaling with Kubernetes and OpenStack, Chapter 5 discuss the related studies and finding,  Chapter 6 Conclusion and future work.
+

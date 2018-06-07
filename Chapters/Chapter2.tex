@@ -1,0 +1,75 @@
+\chapter{ATHENA} 
+
+\label{Chapter2}
+
+\section{Background}
+
+The ATHENA  is the state-of-the-art and purpose-built system which is engineered by \textit{\groupname} at the University of Melbourne for the Australian Defence Science and Technology (DST) Group -- Training Analysis for Workforce Planning\footnote{\url{https://www.dst.defence.gov.au/research-facility/training-analysis-workforce-planning}} research centre. ATHENA is a strategic simulation and analysis system for manpower planning. The aim of the system is tackling workforce planning challenges of the Australian Defence Force (ADF) Training Continuum. 
+
+To begin with, the project requirement rooted as the ADF Helicopter Aircrew Training Continuum (HATC) system. The project purpose is to develop the \textit{Dynamically Reconfigurable Agent-Based Discrete Event Simulator for Aircrew Training}. The HATC\parencite{HATC} sytem is in a constant state of transience such that infrastructure consolidation e.g. phasing out of Aircraft, rules about criteria for passing individual training components, and changes in policies that govern training in individual schools and squadrons -- all these events occur rapidly. Changes like these are common in the system and it inevitably causes perturbations in the flow of students through the training program. Therefore, it requires a framework designed to address the need of ADF to perform \textbf{what-if} scenario analysis. To model such dynamic changes in the HATC complex system, while preserving a common simulation architecture, the paper\parencite{HATC} identified the need of reconfigurable simulation framework. Ever since, the HATC system evolves into the ATHENA and in most recent paper\parencite{8248116}, our stakeholder identified the ATHENA as a more generic simulator for ADF manpower planning needs. 
+%to \textit{deal with manpower planning using a dynamic and interactive system that is agile and adaptive to robustly accommodate change -- without requiring a complete rewrite}.
+The papers further discussed in the choice of Agent-Based Discrete Event Simulation (AB-DES) hybrid model and the details of this modelling domain concept.
+
+The remainder sections of this Chaper 2 focus more on the software engineering perspective and key excerpts from the ATHENA technical documentation v1.0 \parencite{athenaTechDoc} on overview of the system, its architecture and major components, and notable highlight on Bag-of-Tasks scaling potential for remote job execution.
+
+\section{System Overview}
+
+The ATHENA application provides facilities for simulation, visualisation and analysis. These three aspects come together to enable the modelling, exploration and analysis of complex workforce and manpower resourcing scenarios.
+\\
+\\
+%\subsection{Architecture}
+\textbf{Architecture:} \quad It is a multi-user, multi-tier web application. Major components include the user interface, a backend web service, databases, a message broker, and simulation workers. Conceptually, the system follows a traditional 3-tier web application, as depicted in Figure~\ref{fig:conceptArch}. 
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Figures/ATHENA_conceptual_architecture}
+\decoRule
+\caption[ATHENA Conceptual Architecture]{Conceptual view of the multi-tier component architecture of the ATHENA system}
+\label{fig:conceptArch}
+\end{figure}
+
+A user interface (UI), accessible by users via a web browser, provides access to the underlying modelling and simulation system. The user interface communicates with the backend system via REST\footnote{Representational State Transfer} API\footnote{Application Programming Interface} calls. These backend API calls are intercepted by an authentication and authorization layer, which perform user access control (ACL\footnote{Access Control List}) checks before despatching to the various API endpoints. The backend system communicates with databases for the purpose of data persistence.
+
+Apart from these traditional layers described above, the backend also communicates with a message broker for managing compute-intensive simulation tasks -- \textbf{Bag-of-Tasks (BoT)} job execution [using Enterprise Integration pattern -- Publish-Subscribe message-oriented architecture] [NEED-TO-CLARIFY??]. These tasks are performed by a distributed set of workers, each hosting ATHENA's simulation engine.
+\\
+\\
+%\subsection{Technology Stack}
+\textbf{Technology Stack:} \quad Figure~\ref{fig:techStack} depicts ATHENA's technology stack. The backend service is a Spring framework-based modular application, written in Java. Primarily, the backend service provides logic related to the strategic aircrew training continuum, managing interfaces, business logic, data persistence, and distributed computation tasks. The data layer is composed of PostgreSQL RDBMS\footnote{Relational Database Management System}, which stores access control data, and document-oriented NoSQL MongoDB for storing all data related to the simulation model. Computation of simulations are performed by a network of lightweight workers, also written in Java, which communicate with the backend via JMS (Java Message Service). Apache ActiveMQ manages reliable delivery of messages containing simulation requests, results, and status updates. 
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Figures/ATHENA_tech_stack}
+\decoRule
+\caption[ATHENA Technology Stack]{ATHENA technology stack and their respective interactions}
+\label{fig:techStack}
+\end{figure}
+
+The primary user interface is a AngularJS JavaScript Single-Page Application (SPA) loaded in an HTML5 compliant web browser. The UI communicates with the backend application server using both the HTTP REST API and WebSocket channels.
+
+Figure~\ref{fig:scenarioScreen} shows the 10 years simulation result, Scenario view which is the Sankey diagram\footnote{\url{https://en.wikipedia.org/wiki/Sankey_diagram}} (Upper North) -- visualisation of layered flow structure for the flow of the training continuum (left to right). The Bottom South is the scenario timeline that shows the statistical data of trainees or instructors over the whole simulation time span. The result also shows that the simulation have used \textbf{MONTE CARLO and Optimisation algorithms} by labelling at the top left corner of the Sankey diagram.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{Figures/ATHENA_scenario_screen}
+\decoRule
+\caption[ATHENA Scenario View]{ATHENA Scenario View}
+\label{fig:scenarioScreen}
+\end{figure}
+
+\section{Remote Job Execution and Bag-of-Tasks Scaling Potential}
+
+Simulation jobs can be very computationally intensive, especially if one of the optimisation algorithms are activated. For this reason, a master-worker remote execution system has been designed aiming at offering high-performance and reliable simulations. Figure~\ref{fig:remoteJob} depicts this process.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{Figures/ATHENA_remote_job_exec}
+\decoRule
+\caption[ATHENA Remote Job Execution]{ATHENA Process of remotely executing simulation jobs}
+\label{fig:remoteJob}
+\end{figure}
+
+MONTE-CARLO simulations, composed of many repetitions of the same process, are inherently a good fit for this system due to their embarrassingly parallel nature. 
+In the master node, the job execution system is composed of a modular set of services. Once a scenario is submitted for simulation the Scenario Service deals with assembling a simulation model with the correct inputs and creates one sub-scenarios for each MONTE-CARLO repetition. Effectively, the simulation is parallelised into N independent jobs, created by the Job Service, which is responsible for managing the job state, i.e. creating, updating and cancelling job executions. The Remote Job Executor interfaces with the message broker via the JMS protocol. At this point, the Job Request Queue will contain multiple job definitions, ready to be consumed by workers. 
+There can be many worker nodes, which consume messages from the Job Request Queue, interpret the job definition, read job inputs, and perform local execution of the simulation model. As jobs are dequeued, start and finish execution, the worker sends status updates via the Job Status Queue, which are in turn consumed the master in order to provided progress updates to the end-user. Each individual simulation repetition produces one result instance, or intermediate result. These are send via the Results Queue and consumed by an Aggregator Service that performs statistical aggregation, thus producing the mean and confidence intervals of all model statistics over all simulation runs. The execution is reliable in the sense that the failure of a worker does not cause the entire simulation to fail, as failed jobs are simply retried by another available worker. 
+
+For further details, readers are recommended to read the complete documentations of the ATHENA system in \parencite{athenaTechDoc} \parencite{athenaUserDoc}, \parencite{athenaAdminDoc} and \parencite{athenaDeployDoc}.
