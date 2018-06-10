@@ -9,7 +9,7 @@ oneside, % Two side (alternating margins) for binding by default, uncomment to s
 english, % ngerman for German
 singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
 %draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
-nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
 %liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
 %toctotoc, % Uncomment to add the main table of contents to the table of contents
 %parskip, % Uncomment to add space between paragraphs
@@ -21,16 +21,51 @@ consistentlayout, % Uncomment to change the layout of the declaration, abstract 
 
 \usepackage{float}
 
+% https://tex.stackexchange.com/questions/141100/getting-verbatim-with-soft-grey-background-as-in-tex-stackexchange
+% verbatim grey start
+\usepackage{fancyvrb,newverbs,xcolor}
+\definecolor{cverbbg}{gray}{0.93}
+\newenvironment{cverbatim}
+ {\SaveVerbatim{cverb}}
+ {\endSaveVerbatim
+  \flushleft\fboxrule=0pt\fboxsep=.5em
+  \colorbox{cverbbg}{\BUseVerbatim{cverb}}%
+  \endflushleft
+}
+\newenvironment{lcverbatim}
+ {\SaveVerbatim{cverb}}
+ {\endSaveVerbatim
+  \flushleft\fboxrule=0pt\fboxsep=.5em
+  \colorbox{cverbbg}{%
+    \makebox[\dimexpr\linewidth-2\fboxsep][l]{\BUseVerbatim{cverb}}%
+  }
+  \endflushleft
+}
+
+\newcommand{\ctexttt}[1]{\colorbox{cverbbg}{\texttt{#1}}}
+\newverbcommand{\cverb}
+  {\setbox\verbbox\hbox\bgroup}
+  {\egroup\colorbox{cverbbg}{\box\verbbox}}
+% verbatim grey end
+
+
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 
 \usepackage{mathpazo} % Use the Palatino font by default
+
+%\usepackage{ebgaramond,newtxmath,ebgaramond-maths}
+%\usepackage{ebgaramond}\usepackage[ugm]{mathdesign}
+
+
 
 %\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 
 \usepackage[backend=bibtex,style=numeric,sorting=none]{biblatex}
 
 \addbibresource{main.bib} % The filename of the bibliography
+
+\renewcommand*{\bibfont}{\small} % \small \footnotesize
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 
@@ -53,14 +88,14 @@ consistentlayout, % Uncomment to change the layout of the declaration, abstract 
 %----------------------------------------------------------------------------------------
 
 \thesistitle{Auto-scaling an optimisation algorithm using Docker and Kubernetes on the NeCTAR Research Cloud} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
-\supervisor{Prof. Richard \textsc{Sinnott}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
+\supervisor{Prof. Richard O. \textsc{Sinnott}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
 \examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
 \degree{Master of Information Technology} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
 \author{San Kho \textsc{Lin}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
 \addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
 
 \subject{Information Technology} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
-\keywords{auto-scaling, scaling, container orchestration, docker, kubernetes, openstack} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
+\keywords{auto-scaling, scaling, container orchestration, containerisation, docker, kubernetes, openstack} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
 \university{\href{http://www.unimelb.edu.au}{University of Melbourne}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
 \department{\href{https://cis.unimelb.edu.au}{School of Computing and Information Systems}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
 \group{\href{https://eresearch.unimelb.edu.au/}{Melbourne eResearch Group}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
@@ -143,7 +178,7 @@ June 2018\\[0.4cm]
 \begin{itemize} 
 \item This thesis does not incorporate without acknowledgement any material previously submitted for a degree or diploma in any university; and that to the best of my knowledge and belief it does not contain any material previously published or written by another person where due reference is not made in the text.
 \item Where necessary I have received clearance for this research from the University's Ethics Committee and have submitted all required data to the Department.
-\item The thesis is 9999999 words in length (excluding text in images, table, bibliographies and appendices).\\
+\item The thesis is 10317 words in length.\\ % (excluding text in images, table, bibliographies and appendices)
 \end{itemize}
  
 \noindent Signed By:  \emph{San Kho Lin}
@@ -171,7 +206,19 @@ June 2018\\[0.4cm]
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+
+ATHENA is a strategic Discrete Event Simulation (DES) with optimisation and analysis system for manpower planning. It is state-of-the-art, purpose built distributed application. It is containerised and deployed into Cloud platform using Docker technologies. It is a compute intensive application, especially when an optimisation algorithm is activated in simulation. Scaling and, auto-scaling of an optimisation algorithm is the center of this thesis research.
+
+Infrastructure scaling on cloud platform required provider specific API and technology. The containerisation deployment with Docker SWARM and Kubernetes technologies can scale across multi-Clouds independently, without the need of Cloud Provider specific API.
+
+Auto-scaling system can not meet SLO and QoS by simply relying on CPU utilisation metrics alone. Most web and mobile applications require auto-scaling based on Requests Per Second to handle traffic bursts and user load. With new custom metrics API feature introduced in Kubernetes, we can extend the API and expose ATHENA's metrics to Prometheus, then can be consumed by HPA and auto-scaled. For enterprise integration system like ATHENA, the auto scaling could be triggered by the ActiveMQ job queue length exceeding some empirical threshold, therefore, Threshold-based reactive approach with Control Theory auto-scaling technique can be explored.
+
+Effective monitoring and metrics scraping is the heart of the pipeline for auto-scaler to work reliably well. Auto-scaling with Kubernetes is non trivial to setup for \emph{Production Ready} in Private Cloud, such as NeCTAR Research Cloud.
+\\
+\\
+\\
+Keywords: \keywordnames
+
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
@@ -180,7 +227,12 @@ The Thesis Abstract is written here (and usually kept to just this page). The pa
 
 \begin{acknowledgements}
 \addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-The acknowledgments and the people to thank go here, don't forget to include your project advisor\ldots
+
+I would like to thank my supervisor Professor Richard Sinnott for giving me opportunity to research on this challenging project. The door to Professor Sinnott's office was always open whenever I ran into a trouble spot or had a question about my research or writing. He consistently allowed this paper to be my own work, but steered us in the right the direction whenever he thought I needed it.
+
+I am also indebted to my colleagues who work together in ATHENA project, their contribution and, influenced this thesis with their ideas and thoughtful criticisms.
+
+I would like to thank my family for providing me with unfailing support and continuous encouragement throughout the years of study and through the process of researching and writing this thesis. This accomplishment would not have been possible without them.
 
 This research was supported by use of the NeCTAR Research Cloud, a collaborative Australian research platform supported by the National Collaborative Research Infrastructure Strategy.
 
