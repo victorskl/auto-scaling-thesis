@@ -10,7 +10,7 @@ With reference to the official website\footnote{\url{https://kubernetes.io}}, Ku
 
 %Burns:2016:BOK:2898442.2898444
 
-Kubernetes is the third incarnation of Google own container-management systems -- whereas the k8s is built upon its predecessors Borg and Omega \parencite{44843} systems over a decade experience of production run at scale. At Google with Borg system, \parencite{43438} reported that it \emph{runs hundreds of thousands of jobs, from many thousands of different applications, across a number of clusters each with up to tens of thousands of machines}. 
+Kubernetes is the third incarnation of Google own container-management systems -- whereas the k8s is built upon its predecessors Borg and Omega \parencite{44843} systems over a decade experience of production run at scale. At Google with Borg system, \parencite{43438} reported that it \emph{runs hundreds of thousands of jobs, from many thousands of different applications, across a number of clusters each with up to tens of thousands of machines}\ldots
 
 %In \parencite{Hightower:2017:KUR:3175917}, it claims that Google deploys over two billion application containers a week with Borg system. These figures are impressive but it comes in price. 
 
@@ -81,7 +81,7 @@ spec:
 kubectl create -f my-fireball.yaml
 \end{lcverbatim}
 
-\noindent This will pull and deploy the containerised \emph{FireBall} application image from \emph{Container Image Registry}. The use of \textit{FireBall} nomenclature is intentional and the exact behaviour of what \emph{FireBall} type might do is left it for reader interpretation -- e.g. a cluster of Game engine API. This is to show that how Kube API handle custom resources in a generic way through \ctexttt{CustomResourceDefinitions}. Kube Objects are persistent entities (i.e. CRUD\footnote{Create, Read, Update, Delete}) which represent the state of the cluster. In this exercise, we are using \ctexttt{CustomResourceDefinition} which is one of the built-in resource type of Kube API which purpose is to be able to create a \textit{Custom Resources} inside Kube system. Table~\ref{kubeBuiltinResources} summarise the commonly use Kubernetes built-in Resources\footnote{Resource as in REST API} (or \emph{kind}).
+\noindent This will pull and deploy the containerised \emph{FireBall} application image from \emph{Container Image Registry}. The use of \textit{FireBall} nomenclature is intentional and the exact behaviour of what \emph{FireBall} type might do is left it for reader interpretation -- e.g. a cluster of Game engine API. This is to show that how Kube API handle custom resources in a generic way through \ctexttt{CustomResourceDefinitions}. Kube Objects are persistent entities (i.e. CRUD\footnote{Create, Read, Update, Delete}) which represent the state of the cluster. In this exercise, we are using \ctexttt{CustomResourceDefinition} which is one of the built-in resource type of Kube API which purpose is to be able to create a \textit{Custom Resources} inside Kube system. Table~\ref{kubeBuiltinResources} summarise the commonly use Kubernetes built-in Resources\footnote{Resource as in RESTful architecture} (or \emph{kind}).
 
 \begin{table}[H]
 \centering
@@ -250,7 +250,7 @@ For the context of \emph{compute auto-scaling research} presenting in this thesi
 
 \subsection{Service}
 \label{kubeService}
-\noindent \textbf{Service Proxies:} \quad In Kubernetes, Pods are ephemeral and mortal. This is due to the fact that the Kube cluster can replicate Pod, dynamically scale up or down, self-healing and self-managing. As the Pod get destroyed or recycled, the Pod IP address may change. This is not the desire effect for the application developer to keep track of these IP addresses. Service is an network abstraction layer to retain the consistent endpoint within the cluster. Service can be also seen as frontend service proxies for other Kubernetes objects such as Pod, Deployment, ReplicaSet, etc. For the implementation, kube-proxy is responsible for creating a form of Virtual IP in 3 different proxy modes -- userspace, iptables, IPVS --  for Services of type other than ExternalName. For publishing services, it offers 4 different types as summarise in Table~\ref{kubeServiceTypes}.
+\noindent \textbf{Service Proxies:} \quad In Kubernetes, Pods are ephemeral and mortal. This is due to the fact that the Kube cluster can replicate Pod (destroy and re-create new) for dynamically scale up or down, self-healing and self-managing purposes. As the Pod get destroyed or recycled, the Pod IP address may change. This is not the desire effect for the application developer to keep track of these IP addresses. Service is an network abstraction layer to retain the consistent endpoint within the cluster. Service can be also seen as frontend service proxies for other Kubernetes objects such as Pod, Deployment, ReplicaSet, etc. For the implementation, kube-proxy is responsible for creating a form of Virtual IP in 3 different proxy modes -- userspace, iptables, IPVS --  for Services of type other than ExternalName. For publishing services, it offers 4 different types as summarise in Table~\ref{kubeServiceTypes}.
 
 \begin{table}[H]
 \centering
@@ -477,7 +477,7 @@ kubectl get --raw "/apis/metrics.k8s.io/v1beta1/pods" | python -m json.tool
 \end{lcverbatim}
 \end{small}
 
-The prometheus operator \textbf{Clustering Monitoring} documentation\footnote{\url{https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/cluster-monitoring.md}} provides Kubernetes manifests (i.e. YAMLs) for stetting up the \textbf{Prometheus Operator + kube-prometheus monitoring stack}. However, since the stack comprises of multiple components, it is better to use Helm for the setup.  
+The prometheus operator \textbf{Clustering Monitoring} documentation\footnote{\url{https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/cluster-monitoring.md}} provides Kubernetes manifests (i.e. YAMLs) for stetting up the \textbf{Prometheus Operator + kube-prometheus monitoring stack}. However, since the stack comprises of multiple components, it is better to use \textbf{Helm} for the setup.  
 
 \begin{small}
 \begin{lcverbatim}
@@ -637,28 +637,74 @@ Figure~\ref{fig:kubeMonitAthena} depict the full orchestration of Prometheus met
 
 \newpage
 
-\section{Finding}
+\section{Result and Finding}
 
 Though Kubernetes is complex system to master thoroughly, when in operation, it is found that a very robust and flexible system. There also observable notice in overhead such as service proxies network layer. 
 
-During the experimental runs and it is noticed that the auto-scaler doesn't react immediately to usage spikes. By default the metrics sync happens once every 30 seconds and scaling up/down can only happen if there was no rescaling within the last 3-5 minutes. In this way, the HPA prevents rapid execution of conflicting decisions (oscillation). 
+During the experimental runs, it is noticed that the auto-scaler doesn't react immediately to usage spikes. By default the metrics synchronisation happens once every 30 seconds and scaling up/down can only happen if there was no rescaling within the last 3-5 minutes. In this way, the HPA prevents rapid execution of conflicting decisions (oscillation). 
 
-It is also found that auto-scaling based on observed CPU utilisation alone is not sufficient enough for ATHENA worker, due to the dynamic of how the simulation would run: \emph{simulation alone} or \emph{simulation + optimisation}. CPU utilisation scaling works better with optimisation algorithm. However, simulation alone with MONTE CARLO job executed really quick; therefore, miss the scaling observation period delay time and consequently, it missed the HPA replication trigger cycle and there was only 1 worker Pod instance working on jobs -- this could be tune according the target threshold, but it will not be perfect solution. Observing job queue metrics should be implemented.
+It is also found that auto-scaling based on observed CPU utilisation alone is not sufficient enough for ATHENA worker, due to the dynamic of how the simulation would run: \emph{simulation alone} or \emph{simulation + optimisation algorithm}. CPU utilisation scaling works better with optimisation algorithm on. However, simulation run alone with MONTE CARLO job executed really quick. Therefore, it missed the scaling observation period delay time and consequently, it missed the HPA replication trigger cycle and there was only 1 worker Pod instance working on jobs. This can be tune accordingly to the target threshold and CPU utilisation feedback control loop, however, it is still not a perfect solution. In addition of CPU utilisation, observing job queue metrics should be implemented for a better work load balancing.
 
-Figure~\ref{fig:kubeAthena} depict the ATHENA deployment with Kubernetes cluster. Docker Registry is a container image registry hosted using Nexus repository manager.
+Figure~\ref{fig:kubeAthenaArch} depicts the architectural view of ATHENA deployment with Kubernetes cluster. Docker Registry is a container image registry hosted using Nexus repository manager.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.5\paperwidth]{Figures/ATHENA_Kube_cluster}
+\includegraphics[width=0.4\paperwidth]{Figures/ATHENA_Kube_cluster}
 \decoRule
-\caption[Kubernetes Cluster ATHENA]{Kubernetes Cluster ATHENA}
-\label{fig:kubeAthena}
+\caption[Kubernetes Cluster for ATHENA Deployment: Architecture]{Kubernetes Cluster for ATHENA Deployment: Architecture}
+\label{fig:kubeAthenaArch}
+\end{figure}
+
+Figure~\ref{fig:kubeAthenaTerm} shows the terminal screenshot of Kubernetes cluster up and running the ATHENA software stack. And Figure~\ref{fig:kubeAthenaGraf} shows the screenshot of Grafana\footnote{\url{https://grafana.com}} monitoring dashboard for observing  auto-scaling of ATHENA worker -- where the Replica trend shows the discrete steps of worker Pods scaling up/down, during a simulation run.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\paperwidth]{Figures/KUBE_ATHENA_term_long}
+\decoRule
+\caption[Kubernetes Cluster for ATHENA Deployment: Terminal]{Kubernetes Cluster for ATHENA Deployment: Terminal}
+\label{fig:kubeAthenaTerm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\paperwidth]{Figures/KUBE_ATHENA_grafana_autoscale_dash}
+\decoRule
+\caption[Kubernetes Cluster for ATHENA Deployment: Grafana]{Kubernetes Cluster for ATHENA Deployment: Grafana}
+\label{fig:kubeAthenaGraf}
 \end{figure}
 
 
+Figure~\ref{fig:kubeAthenaProm} shows the screenshot of the Prometheus dashboard along with the Prometheus query and result graphing from Prometheus time-series database.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\paperwidth]{Figures/KUBE_ATHENA_prometheus}
+\decoRule
+\caption[Kubernetes Cluster for ATHENA Deployment: Prometheus]{Kubernetes Cluster for ATHENA Deployment: Prometheus}
+\label{fig:kubeAthenaProm}
+\end{figure}
 
+The following is an example of Prometheus query that summing over
+\\
+\verb|container_cpu_usage_seconds_total| metrics at rate of 5 minutes averaging on all ATHENA worker Pods.
 
+\begin{small}
+\begin{lcverbatim}
+sum(rate(container_cpu_usage_seconds_total{namespace="default",\
+	container_name="athena-worker",pod_name=~"athena-worker.*"}[5m])) \
+	without (id, name, image, instance, pod, job, namespace, service, \
+	container_name, cpu, endpoint)
+\end{lcverbatim}
+\end{small}
 
+The following is an example of Prometheus query that find the maximum of 
+\\
+\verb|kube_hpa_status_current_replicas| metrics -- the current max replica created by the HPA controller.
 
+\begin{small}
+\begin{lcverbatim}
+max(kube_hpa_status_current_replicas{hpa="athena-worker",namespace="default"}) \
+	without (instance, pod)
+\end{lcverbatim}
+\end{small}
 

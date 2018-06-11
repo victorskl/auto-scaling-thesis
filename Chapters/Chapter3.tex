@@ -1,4 +1,4 @@
-\chapter{Deployment: Scaling and Containerisation}
+\chapter{Deployment: Containerisation and Scaling}
 
 \label{Chapter3}
 
@@ -22,7 +22,7 @@ Contrary to typical lab or experimental setup that use for benchmarking or compa
 
 ATHENA uses NeCTAR as the main IaaS Cloud provider. NeCTAR infrastructure is implemented and managed using the OpenStack cloud computing framework. The ATHENA deployment is leveraging across two tenancies with total number of 300 vCPU cores allocated for the project. The typical choice of instance size is between \textbf{m1} and \textbf{m2} flavours of \textbf{large}, \textbf{xlarge} \footnote{\url{https://support.ehelp.edu.au/support/solutions/articles/6000055380-resources-available-to-you}} ranging between 4 cores to 16 cores. The choice of base image is \textit{NeCTAR Ubuntu 16.04 LTS (Xenial) amd64}.
 
-The ATHENA source code version control is hosted on Microsoft Visual Studio Team Services (VSTS)\footnote{\url{https://www.visualstudio.com/team-services}}. The deployment is mainly driven by Git Workflow\footnote{\url{https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows}} and VSTS's build and release pipelines. The VSTS's \textbf{Continuous Integration} (CI) and \textbf{Continuous Delivery} (CD) \parencite{httermann2012devops} are setup to push to the target deployment environments. The terms \textbf{DEV}, \textbf{STAGING} and \textbf{PROD} in Figure~\ref{fig:deployVSTS} represent the development, staging and production deployment environments of the ATHENA software stack. Build-agents are the VSTS build slaves for compiling and building the ATHENA artifacts.
+The ATHENA source code version control is hosted on Microsoft Visual Studio Team Services (VSTS)\footnote{\url{https://www.visualstudio.com/team-services}}. The deployment is mainly driven by Git Workflow\footnote{\url{https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows}}, VSTS's build and release pipelines. The VSTS's \textbf{Continuous Integration} (CI) and \textbf{Continuous Delivery} (CD) \parencite{httermann2012devops} are setup to push to the target deployment environments. The terms \textbf{DEV}, \textbf{STAGING} and \textbf{PROD} in Figure~\ref{fig:deployVSTS} represent the development, staging and production deployment environments of the ATHENA software stack. Build-agents are the VSTS build slaves for compiling and building the ATHENA artifacts.
 
 \begin{figure}[H]
 \centering
@@ -72,7 +72,7 @@ docker-compose -f docker-compose.yaml -f staging.yaml  --project-name=stg \
 \label{fig:deployDockerised}
 \end{figure}
 
-\noindent \textbf{Dedicated Workers:} \quad As discussed in Chapter \ref{Chapter2}, the worker Remote Job Execution and computation can become very CPU intensive when \textbf{Optimisation algorithms} are activated in the simulated scenario. Further attempt to improve worker's computation throughput, we can split the worker containers into the pool of worker nodes as shown in Figure~\ref{fig:dedicatedWorkers}. This solution is expensive but a good compromise if dedicated worker service is needed for QoS purpose.
+\noindent \textbf{Dedicated Workers:} \quad As discussed in Chapter \ref{Chapter2}, the worker Remote Job Execution and computation can become very CPU intensive when one of  \textbf{optimisation algorithms} is activated in the simulated scenario. Further attempt to improve worker's computation throughput, we can split the worker containers into the pool of worker nodes as shown in Figure~\ref{fig:dedicatedWorkers}. This solution is expensive but a good compromise if dedicated worker service is needed for QoS purpose.
 
 \begin{figure}[H]
 \centering
@@ -116,6 +116,8 @@ athena_worker scaled to 5
 \end{lcverbatim}
 \end{small}
 
-For the intreset of the thesis length, the details review of how Docker SWARM works\footnote{\url{https://docs.docker.com/engine/swarm/how-swarm-mode-works/nodes/}} is left to its documentation. This thesis takes advantage of the related studies made within the \textit{\groupname}, of which studies \parencite{swarmKubeBench2} benchmarks on the performance and qualitative comparison of Docker SWARM and Kubernetes. There are also vest amount of internet articles available on qualitative comparison e.g. Platform9\footnote{\url{https://platform9.com/blog/kubernetes-docker-swarm-compared/}}. Base on these literatures, we can conclude that the technical merit of both systems is closely matched, however, in the context of the research presenting in this paper, the \emph{built-in Auto-Scaling feature} in Kubernetes has ruled out for a probable auto-scaling solution for the ATHENA system. The justification to \emph{why Kubernetes} decision is somewhat empirical and pragmatic observation over adoption of Kubernetes trend by many Cloud providers and key players, e.g. Google, IBM, Azure, AWS, RedHat to name few. The Chapter \ref{Chapter4} reinforces this hypothesis.
+For the intreset of the thesis length, the details review of how Docker SWARM works\footnote{\url{https://docs.docker.com/engine/swarm/how-swarm-mode-works/nodes/}} is left to its documentation. This thesis takes advantage of the related studies made within the \textit{\groupname}, of which studies \parencite{swarmKubeBench2} benchmarks on the performance and qualitative comparison of Docker SWARM and Kubernetes. There are also vest amount of internet articles available on qualitative comparison of these two technologies e.g. Platform9\footnote{\url{https://platform9.com/blog/kubernetes-docker-swarm-compared/}}. 
+
+Base on these literatures, we can conclude that the technical merit of both technologies is closely matched, however, in the context of the research presenting in this paper, the \emph{built-in Auto-Scaling feature} in Kubernetes has ruled out for a probable auto-scaling solution for the ATHENA system. The justification to \emph{why Kubernetes} decision is somewhat empirical and pragmatic observation over adoption of Kubernetes trend by many Cloud providers and key players, e.g. Google, IBM, Azure, AWS, RedHat to name few. The technical insight in Chapter \ref{Chapter4} reinforces this hypothesis.
 
 % \parencite{swarmKubeBench}
