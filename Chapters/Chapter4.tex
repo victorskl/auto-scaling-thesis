@@ -14,9 +14,9 @@ Kubernetes is the third incarnation of Google own container-management systems -
 
 %In \parencite{Hightower:2017:KUR:3175917}, it claims that Google deploys over two billion application containers a week with Borg system. These figures are impressive but it comes in price. 
 
-\section{Looking at Kube Design}
+\section{Looking at Kubernetes Design}
 \label{kubeDesign}
-From Borg-Omega to Kube, the Google software engineers learned lessons\parencite{44843} on how best to tackle with the container-management at design\footnote{\url{https://kubernetes.io/blog/2015/06/the-distributed-system-toolkit-patterns/}} and bring the architecture to next level\footnote{\url{https://kubernetes.io/blog/2016/06/container-design-patterns/}} to make it easy for developers to write the distributed applications and services that run in cloud and datacenter environments. Looking at Kubernetes, we can observe that the design of the system become more generic and abstraction compare to its predecessors. It goes beyond more than container-management. Since the process of containerisation encapsulates the application, Kubernetes introduces \textit{Application-Oriented Infrastructure} (AOI) with two motivations:
+From Borg-Omega to Kubernetes, the Google software engineers learned lessons\parencite{44843} on how best to tackle with the container-management at design\footnote{\url{https://kubernetes.io/blog/2015/06/the-distributed-system-toolkit-patterns/}} and, bring the architecture to next level\footnote{\url{https://kubernetes.io/blog/2016/06/container-design-patterns/}} to make it easy for developers to write the distributed applications and services that run in cloud and datacenter environments. Looking at Kubernetes, we can observe that the design of the system become more generic and abstraction compare to its predecessors. It goes beyond more than container-management. Since the process of containerisation encapsulates the application, Kubernetes introduces \textit{Application-Oriented Infrastructure} (AOI) with two motivations:
 \begin{itemize}
 \item abstracting away details of machine and operating system from application developer and deployment
 \item \emph{single application process per container} Design Pattern entails that managing containers mean managing applications, therefore, it shifts the Kube API from machine-oriented to application-oriented and, improves application deployment and introspection 
@@ -46,29 +46,28 @@ From Borg-Omega to Kube, the Google software engineers learned lessons\parencite
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: fireball.sankholin.com
+  name: fireballs.api.sankholin.com
 spec:
-  group: fireball.sankholin.com
+  group: api.sankholin.com
   version: v1
   scope: Namespaced
   names:
     plural: fireballs
     singular: fireball
     kind: FireBall
-    shortNames: 
-    - fb
-    - FB
 \end{lcverbatim}
 
 \noindent And create this \ctexttt{FireBall} type in Kube API:
 \begin{lcverbatim}
-kubectl create -f  CRD_Fireball.yaml
+kubectl create -f CRD_Fireball.yaml
+kubectl get crd
+kubectl api-versions
 \end{lcverbatim}
 
 \noindent And now we can prescribe our \ctexttt{FireBall} type in YAML as follows. Notice of \emph{kind} field.
 
 \begin{lcverbatim}
-apiVersion: "fireball.sankholin.com/v1"
+apiVersion: "api.sankholin.com/v1"
 kind: FireBall
 metadata:
   name: my-fireball-object
@@ -76,12 +75,14 @@ spec:
   image: sankholin.com/fireball-container-image:latest
 \end{lcverbatim}
 
-\noindent Finally, create an instance of \ctexttt{FireBall} object.
+\noindent Finally, create an instance of \ctexttt{FireBall} custom Kubernetes object.
 \begin{lcverbatim}
 kubectl create -f my-fireball.yaml
+kubectl get fireball
+kubectl get fireball -o yaml
 \end{lcverbatim}
 
-\noindent This will pull and deploy the containerised \emph{FireBall} application image from \emph{Container Image Registry}. The use of \textit{FireBall} nomenclature is intentional and the exact behaviour of what \emph{FireBall} type might do is left it for reader interpretation -- e.g. a cluster of Game engine API. This is to show that how Kube API handle custom resources in a generic way through \ctexttt{CustomResourceDefinitions}. Kube Objects are persistent entities (i.e. CRUD\footnote{Create, Read, Update, Delete}) which represent the state of the cluster. In this exercise, we are using \ctexttt{CustomResourceDefinition} which is one of the built-in resource type of Kube API which purpose is to be able to create a \textit{Custom Resources} inside Kube system. Table~\ref{kubeBuiltinResources} summarise the commonly use Kubernetes built-in Resources\footnote{Resource as in RESTful architecture} (or \emph{kind}).
+\noindent Note that \verb|my-fireball-object| custom object contains custom field \verb|spec.image|, which can be arbitrary JSON field and, for example, this will pull and deploy the containerised \emph{FireBall} application image from \emph{Container Image Registry}. The use of \textit{FireBall} nomenclature is intentional and the exact behaviour of what \emph{FireBall} type might do is left it for reader interpretation -- e.g. a cluster of Game engine. This is to show that how Kube API handle custom resources in a generic way through \ctexttt{CustomResourceDefinition}. Kube Objects are persistent entities (i.e. CRUD\footnote{Create, Read, Update, Delete}) which represent the state of the cluster. In this exercise, we are using \ctexttt{CustomResourceDefinition} which is one of the built-in resource type of Kube API which purpose is to be able to create a \textit{Custom Resources} inside Kube system. Table~\ref{kubeBuiltinResources} summarise the commonly use Kubernetes built-in Resources\footnote{Resource as in RESTful architecture} (or \emph{kind}).
 
 \begin{table}[H]
 \centering
@@ -123,7 +124,7 @@ Kubernetes is a much more complex system to up and run with -- it is quite a dau
 \label{kubeMasterComp}
 \end{table}
 
-\noindent \textbf{Hard Way:} \quad For straight forward approach, we could spin up one node and install all the components mention in Table~\ref{kubeMasterComp} to run as Kube Master role. And spin up one or more nodes to install all the components mention in Table~\ref{kubeNodeComp} to run as Kube Node role. Since Kubernetes is written in GoLang\footnote{\url{https://golang.org}}, we could download the source -- compile, build -- or download pre-compiled binary and run executables in foreground or wrap into \verb|systemd| daemon services. This would work in principle, at least. However so, this has to deal with more low level handling and, generally \emph{"goto"} setup for a Kube developer.
+\noindent \textbf{Hard Way:} \quad For straight forward approach, we could spin up one node and install all the components mention in Table~\ref{kubeMasterComp} to run as Kube Master role. And spin up one or more nodes to install all the components mention in Table~\ref{kubeNodeComp} to run as Kube Node role. Since Kubernetes is written in GoLang\footnote{\url{https://golang.org}}, we could download the source -- compile, build -- or, download pre-compiled binary and run executables in foreground or, wrap into \verb|systemd| daemon services. This would work in principle, at least. However so, this has to deal with more low level handling and, generally \emph{"goto"} setup for a Kube developer.
 
 \begin{table}[H]
 \centering
@@ -155,7 +156,7 @@ Kubernetes is a much more complex system to up and run with -- it is quite a dau
 \label{kubeToolkits}
 \end{table}
 
-The kubeadm is chosen to bootstrap the Kube cluster for the purpose of ATHENA deployment. However, also note that, Kubernetes documentation offer dozens of different way\footnote{\url{https://kubernetes.io/docs/setup/pick-right-solution/}} to setup Kube cluster. This research finds that kubeadm is the most appropriate toolkit for setting up \emph{Production Ready} Kubernetes cluster. The justification for \emph{why kubeadm} is because it is the Kubernetes Certified Solution as of v1.10, its abstraction to IaC automation tool and it can streamline the upgrade of the Kube cluster reliably.
+The kubeadm is chosen to bootstrap the Kube cluster for the purpose of ATHENA deployment. However, also note that, Kubernetes documentation offer dozens of different ways\footnote{\url{https://kubernetes.io/docs/setup/pick-right-solution/}} to setup Kube cluster. This research finds that \textbf{kubeadm} is the most appropriate toolkit for setting up \emph{Production Ready} Kubernetes cluster. The justification for \emph{why kubeadm} is because it is the Kubernetes \textbf{Certified Solution} as of v1.10, its abstraction to IaC automation tool and it can streamline the upgrade of the Kube cluster reliably well as shown below.
 
 \begin{small}
 \begin{lcverbatim}
@@ -196,7 +197,7 @@ root@athena-kube-master1:~# kubeadm upgrade apply v1.10.2
 \centering
 \includegraphics[width=0.55\paperwidth]{Figures/KUBE_kubeadm}
 \decoRule
-\caption[Kubebernetes Components on Master and Node]{Kubebernetes Components on Master and Node using kubeadm}
+\caption[Kubernetes components on Master and Node using kubeadm]{Kubernetes components on Master and Node using kubeadm}
 \label{fig:kubeadm}
 \end{figure}
 
@@ -221,30 +222,30 @@ spec:
     (scrap)
 \end{lcverbatim}
 
-However, note that, kubeadm created the kube-apiserver component as a special Pod type called Static Pod. From k8s documentation\footnote{\url{https://kubernetes.io/docs/tasks/administer-cluster/static-pod/}}, \parencite{kubeDoc} states that \emph{Static Pods are managed directly by kubelet daemon on a specific node, without the API server observing it. Kubelet automatically creates so-called mirror pod on the Kubernetes API server for each static pod, so the pods are visible there, but they cannot be controlled from the API server}. From this, we can also observe that kubelet can directly bootstrap a Pod, and it shares the Kubernetes Objects Management with the kube-apiserver to sudden extent.
+However, note that, kubeadm created the kube-apiserver component as a special Pod type called Static Pod. From k8s documentation\footnote{\url{https://kubernetes.io/docs/tasks/administer-cluster/static-pod/}}, \parencite{kubeDoc} states that \emph{Static Pods are managed directly by kubelet daemon on a specific node, without the API server observing it. Kubelet automatically creates so-called mirror pod on the Kubernetes API server for each static pod, so the pods are visible there, but they cannot be controlled from the API server}. From this, we can also observe that kubelet can directly bootstrap a Pod, and it shares the Kubernetes objects management along with the kube-apiserver to sudden extent.
 
 \subsection{Add-ons}
 
-In addition to the Kubernetes Master and Node components (Tables~\ref{kubeMasterComp}, \ref{kubeNodeComp}), we can also observe that there are kube-dns on Master role and, kube-flannel running on both Master and Node role. These components are called \textbf{Add-ons}\footnote{\url{https://kubernetes.io/docs/concepts/cluster-administration/addons/}} which extend the functionality of Kubernetes. Table~\ref{kubeadmAddons} summarise components that are deployed as part of the bootstrapping Kubernetes cluster by \verb|kubeadm init|\footnote{\url{https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/}}.
+In addition to the Kubernetes Master and Node components (Tables~\ref{kubeMasterComp}, \ref{kubeNodeComp}), we can also observe that there are kube-dns on Master role (installed by part of \verb|kubeadm init|\footnote{\url{https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/}}) and, kube-flannel running on both Master and Node role. These components are called \textbf{Add-ons}\footnote{\url{https://kubernetes.io/docs/concepts/cluster-administration/addons/}} which extend the functionality of Kubernetes. Table~\ref{kubeadmAddons} summarise components that are deployed as part of the bootstrapping Kubernetes cluster.
 
 \begin{table}[H]
 \centering
     \begin{tabular}{ | l | p{11cm} |}
     \hline
     Add-ons & Description \\ \hline
-    kube-dns & The internal implementation for Kubernetes DNS service. \\ \hline
-    kube-flannel & Flannel\footnote{\url{https://github.com/coreos/flannel}} is an overlay network provider that can be used with Kubernetes Pod network. \\ 
+    \href{https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns/kube-dns}{kube-dns} & The internal implementation for Kubernetes DNS service. \\ \hline
+   \href{https://github.com/coreos/flannel}{kube-flannel} & Flannel is an overlay network provider that can be used with Kubernetes Pod network. \\ 
     \hline
     \end{tabular}
-\caption{Additional components deployed by kubeadm init}
+\caption{Additional compulsory Kubernetes add-ons components}
 \label{kubeadmAddons}  
 \end{table}
 
-\noindent To bootstrap the full-fledge \emph{Production Ready} Kubernetes cluster, there are compulsory add-ons such as like these. Note though that, Kubernetes documentation \parencite{kubeDoc} offer a dozens of Add-ons\footnote{\url{https://kubernetes.io/docs/concepts/cluster-administration/addons/}}; some of which are competing technologies and alternatives for the particular functionality e.g. to use \textbf{Weave Net} instead of \textbf{Flannel} for Pod Networking.
+\noindent To bootstrap the full-fledge \emph{Production Ready} Kubernetes cluster, there are compulsory add-ons such as like these. Note though that, Kubernetes documentation \parencite{kubeDoc} offer dozens of Add-ons; some of which are competing technologies and alternatives for the particular functionality e.g. to use \textbf{Weave Net} instead of \textbf{Flannel} for Pod Networking.
 
 \subsection{Pod Networking}
 
-From Table~\ref{kubeadmAddons}, there is a notion of \emph{Overlay Network}. In Kubernetes, the concept of Pod is to encapsulates containers. A Kube Pod object holds one or more containers, and introduces IP-per-Pod for network model. It implies IP addresses at the Pod scope. Therefore, containers within a Pod share their network namespaces including their IP address. The Pod networking requirement\parencite{kubeDoc} states that nodes and containers can communicate with all other containers \textbf{without NAT} and, the IP that a container sees itself as is the same IP that others see it as. In a nutshell, Kubernetes network model imposes barring any NAT -- intentional network segmentation policies. Kubernetes documentation offers a dozen of different way\footnote{\url{https://kubernetes.io/docs/concepts/cluster-administration/networking/}} for implementing this networking requirement -- Overlay Network is one of them. The implementation usually offer as \emph{Add-ons}, however, it is a compulsory step. Medium articles by google-cloud\footnote{\url{https://medium.com/google-cloud/understanding-kubernetes-networking-pods-7117dd28727}}, ApsOps\footnote{\url{https://medium.com/@ApsOps/an-illustrated-guide-to-kubernetes-networking-part-2-13fdc6c4e24c}} illustrated details on how Overlay Network is used for Kubernetes Pod networking requirement.
+From Table~\ref{kubeadmAddons}, there is a notion of \textbf{Overlay Network}. In Kubernetes, the concept of Pod is to encapsulates containers. A Kube Pod object holds one or more containers and, introduces \textbf{IP-per-Pod} for network model. It implies IP addressing at the Pod scope. Therefore, containers within a Pod share their network namespaces including their IP address. The Pod networking requirement \parencite{kubeDoc} states that nodes and containers can communicate each others without Network Address Translation (NAT). Therefore, the IP that a container sees itself as is the same IP that others see it as. In a nutshell, Kubernetes network model imposes barring usage of intentional network segmentation policies such as NAT. Kubernetes documentation offers dozens of different ways\footnote{\url{https://kubernetes.io/docs/concepts/cluster-administration/networking/}} for implementing this networking requirement -- Overlay Network is one of them. The implementation usually offer as \emph{Add-ons}, however, it is a compulsory step. Medium articles by google-cloud\footnote{\url{https://medium.com/google-cloud/understanding-kubernetes-networking-pods-7117dd28727}}, ApsOps\footnote{\url{https://medium.com/@ApsOps/an-illustrated-guide-to-kubernetes-networking-part-2-13fdc6c4e24c}} illustrated details on how Overlay Network is used for Kubernetes Pod networking requirement. %It is observed that with Overlay Network, Kubernetes cluster can be extended across multiple Cloud providers and geographically separated data centres.
 
 For the context of \emph{compute auto-scaling research} presenting in this thesis, the further investigation on performance comparison of Pod Networking with competing technologies left out for future work.
 
@@ -267,7 +268,7 @@ For the context of \emph{compute auto-scaling research} presenting in this thesi
 \label{kubeServiceTypes}  
 \end{table}
 
-\noindent \textbf{Service Discovery:} \quad For Service Discovery purpose, Kubernetes runs internal DNS. This comes in as \textbf{Add-ons}, however, compulsory. Kubeadm deployed kube-dns\footnote{\url{https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/}} Pod for this purpose. For example, the following \verb|athena-ui.yaml| service manifest creates a service endpoint for the athena-ui.
+\noindent \textbf{Service Discovery:} \quad For Service Discovery purpose, Kubernetes runs internal DNS. This comes in as Add-ons, however, compulsory. Kubeadm deployed kube-dns\footnote{\url{https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/}} Pod for this purpose. For example, the following \verb|athena-ui.yaml| service manifest creates a service endpoint for the athena-ui.
 
 \begin{small}
 \begin{lcverbatim}
@@ -297,7 +298,7 @@ athena-ui           ClusterIP   10.103.117.69    <none>        80/TCP    82d
 \end{lcverbatim}
 \end{small}
 
-\noindent In this example, we can say that, the athena-ui.yaml service manifest created a DNS
+\noindent In this example, we can say that, the \verb|athena-ui.yaml| service manifest created a DNS
 \\
 \verb|athena-ui.default.svc.cluster.local|
 \\
@@ -338,7 +339,7 @@ backend athena
 
 \subsection{Volume and Storage}
 
-Kubernetes offer a dozens of different way\footnote{\url{https://kubernetes.io/docs/concepts/storage/volumes/}} for setting up volume and storage. Likewise in Docker container, volume in Kubernetes are ephemeral i.e. data will be lost if the Pod restart has happened. Table~\ref{kubeVol} list some basic volume that can be used by Kubernetes Pod, StatefulSets, etc.
+Kubernetes also offer dozens of different ways\footnote{\url{https://kubernetes.io/docs/concepts/storage/volumes/}} for setting up volume and storage. Likewise in Docker container, volume in Kubernetes are ephemeral i.e. data will be lost if the Pod restart has happened. Table~\ref{kubeVol} list some basic volume that can be used by Kubernetes Pod, StatefulSets, etc.
 
 \begin{table}[H]
 \centering
@@ -360,7 +361,7 @@ For the context of \emph{compute auto-scaling research} presenting in this thesi
 
 \section{Instrumentation and Metrics}
 \label{metrics}
-Kubernetes core components (Tables~\ref{kubeMasterComp}, \ref{kubeNodeComp}) are instrumented and exposed at \verb|/metrics|. By default, metrics are in Prometheus format\footnote{\url{https://prometheus.io/docs/instrumenting/exposition_formats/}}. When making HTTP GET request to /metrics on the component being monitored, it expects to return a set of line delimited metrics. The following is an example of kube-apiserver component metrics.
+Kubernetes core components (Tables~\ref{kubeMasterComp}, \ref{kubeNodeComp}) are instrumented and exposed at \verb|/metrics|. By default, metrics are in Prometheus format\footnote{\url{https://prometheus.io/docs/instrumenting/exposition_formats/}}. When making HTTP GET request to \verb|/metrics| on the component being monitored, it expects to return a set of line delimited metrics. The following is an example of kube-apiserver component metrics.
 
 \begin{small}
 \begin{lcverbatim}
@@ -408,7 +409,7 @@ curl -s http://localhost:10255/stats/summary | less
 \end{lcverbatim}
 \end{small}
 
-Before Kubernetes v1.9, the popular stack is Heapster + InfluxDB for consuming these metrics and storing them as timeseries data. However, as of v1.10, Heapster is deprecated\footnote{\url{https://github.com/kubernetes/heapster/blob/master/docs/deprecation.md}} in favour for an overhaul with Metrics API\footnote{\url{https://brancz.com/2018/01/05/prometheus-vs-heapster-vs-kubernetes-metrics-apis/}} at Kubernetes Instrumentation and monitoring architecture\footnote{\url{https://github.com/kubernetes/community/blob/master/contributors/design-proposals/instrumentation/monitoring_architecture.md}}. And the Metrics Server is the official\footnote{\url{https://kubernetes.io/docs/tasks/debug-application-cluster/core-metrics-pipeline/}} successor to replace Heapster. Prometheus is used for the monitoring and scraping various Kubernetes components metrics. Prometheus is primarily a pull style monitoring platform. In particular, \textbf{Prometheus Operator\footnote{\url{https://github.com/coreos/prometheus-operator}} + kube-prometheus\footnote{\url{https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus}}} stack  is chosen empirically based on different trials.
+Before Kubernetes v1.9, the popular stack is Heapster + InfluxDB for consuming these metrics and storing them as timeseries data. However, as of v1.10, Heapster is deprecated\footnote{\url{https://github.com/kubernetes/heapster/blob/master/docs/deprecation.md}} in favour for an overhaul with Metrics API\footnote{\url{https://brancz.com/2018/01/05/prometheus-vs-heapster-vs-kubernetes-metrics-apis/}} at Kubernetes Instrumentation and monitoring architecture\footnote{\url{https://github.com/kubernetes/community/blob/master/contributors/design-proposals/instrumentation/monitoring_architecture.md}}. And the Metrics Server is the official\footnote{\url{https://kubernetes.io/docs/tasks/debug-application-cluster/core-metrics-pipeline/}} successor to replace Heapster. Prometheus is used for the monitoring and scraping various Kubernetes components metrics. In particular, \textbf{Prometheus Operator\footnote{\url{https://github.com/coreos/prometheus-operator}} + kube-prometheus\footnote{\url{https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus}}} stack  is chosen empirically based on different trials. Prometheus is primarily a pull style monitoring platform. The justification for \textit{why Prometheus} is mainly based on this metrics polling approach for better performance outcome. This essentially does not impose stress and load on the monitored application. Furthermore, Prometheus offer many third-party metrics exporters\footnote{\url{https://prometheus.io/docs/instrumenting/exporters/}} such as the JMX exporter which can export from a wide variety of JVM-based applications (e.g. ActiveMQ, Kafka) and, timing and gauging HTTP Requests/Responses (e.g. Apache, Nginx, HAProxy) metrics and workload.
 %\begin{figure}[H]
 %\centering
 %\includegraphics[width=0.5\paperwidth]{Figures/Prom_Operator_Architecture}
@@ -537,7 +538,7 @@ kubectl scale deployment athena-worker --replicas=5
 \end{lcverbatim}
 \end{small}
 
-\noindent Recall (Chapter~\ref{Chapter3}) that this is the similar scaling we did in the plain vanilla Docker-Compose and SWARM stack deployment.
+\noindent Recall (Chapter~\ref{Chapter3}) that this is the similar scaling we did in the plain vanilla Docker-Compose and Swarm stack deployment.
 
 \begin{small}
 \begin{lcverbatim}
@@ -594,8 +595,7 @@ kubectl create -f athena-worker-hpa.yaml
 \end{lcverbatim}
 \end{small}
 
-The Horizontal Pod Autoscaler feature was introduced in Kubernetes v1.1. The first version of HPA scale the Pod based on observed CPU utilization and memory usage. In Kubernetes 1.6, the Custom Metrics API was introduced that enables HPA access to arbitrary metrics through REST API. In Kubernetes 1.7, the API server aggregation layer allows third party applications to extend the Kubernetes API by registering themselves as API \emph{add-ons}. Note that, the concept about API server aggregation\footnote{\url{https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/}} is similar to \ctexttt{CustomResourceDefinition} (section~\ref{kubeDesign}), but more flexible. 
-%The Custom Metrics API along with the aggregation layer made it possible for monitoring systems like Prometheus to expose application-specific metrics to the HPA controller.
+The Horizontal Pod Autoscaler feature was introduced in Kubernetes v1.1. The first version of HPA scale the Pod based on observed CPU utilization and memory usage. In Kubernetes 1.6, the Custom Metrics API was introduced that enables HPA access to arbitrary metrics through REST API. In Kubernetes 1.7, the API server aggregation layer allows third party applications to extend the Kubernetes API by registering themselves as API \emph{Add-ons}. Note that, the concept about API server aggregation\footnote{\url{https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/}} is similar to \ctexttt{CustomResourceDefinition} (section~\ref{kubeDesign}), but offer more flexible implementation option. 
 
 Figure~\ref{fig:kubeMonitAthena} depict the full orchestration of Prometheus metrics monitoring stack with HPA. In Core Metrics pipeline, Metrics Server scrape node and container metrics from Kubelet cAdvisor. In Monitoring pipeline, Prometheus operator collect metrics through its ServiceMonitor and store in Prometheus. And the Grafana dashboard can visual these monitoring metrics. Furthermore, with Prometheus Adapter (an API server aggregation implementation), the Prometheus metrics can be consumed by HPA.
 
@@ -606,6 +606,27 @@ Figure~\ref{fig:kubeMonitAthena} depict the full orchestration of Prometheus met
 \caption[Kubernetes Cluster: HPA and Monitoring for ATHENA]{Kubernetes Cluster: HPA and Monitoring for ATHENA}
 \label{fig:kubeMonitAthena}
 \end{figure}
+
+Kubernetes Custom Metrics API along with the API Aggregation Layer make it possible for monitoring systems like Prometheus to expose application-specific metrics to the HPA controller. For Spring Boot application like ATHENA API service, it is relatively straight forward to expose metrics on JVM stats, embedded Tomcat (HTTP Requests/Responses traffic load) and any application-specific metrics (e.g. workload and number of Jobs in queue) using Actuator\footnote{\url{https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready.html}} and Micrometer\footnote{\url{http://micrometer.io}}. 
+\begin{small}
+\begin{lcverbatim}
+curl -s https://athena-dev.eresearch.unimelb.edu.au/prometheus
+# HELP jvm_memory_used_bytes The amount of used memory
+# TYPE jvm_memory_used_bytes gauge
+jvm_memory_used_bytes{area="heap",id="PS Survivor Space",} 2.3983848E7
+jvm_memory_used_bytes{area="heap",id="PS Old Gen",} 1.11927144E8
+jvm_memory_used_bytes{area="heap",id="PS Eden Space",} 7.72185792E8
+(scrap)
+# HELP http_server_requests_duration_seconds Timer of servlet request
+# TYPE http_server_requests_duration_seconds summary
+http_server_requests_duration_seconds_count{method="GET",uri="/login",} 101.0
+http_server_requests_duration_seconds_sum{method="GET",uri="/login",} 0.8731 218.975
+(scrap)
+\end{lcverbatim}
+\end{small}
+
+
+\newpage
 
 \noindent \textbf{HPA Autoscaling Algorithm:} \quad Based on \parencite{kubeDoc}, the HPA implementation of autoscaling algorithm works as follow.
 
@@ -643,7 +664,7 @@ Though Kubernetes is complex system to master thoroughly, when in operation, it 
 
 During the experimental runs, it is noticed that the auto-scaler doesn't react immediately to usage spikes. By default the metrics synchronisation happens once every 30 seconds and scaling up/down can only happen if there was no rescaling within the last 3-5 minutes. In this way, the HPA prevents rapid execution of conflicting decisions (oscillation). 
 
-It is also found that auto-scaling based on observed CPU utilisation alone is not sufficient enough for ATHENA worker, due to the dynamic of how the simulation would run: \emph{simulation alone} or \emph{simulation + optimisation algorithm}. CPU utilisation scaling works better with optimisation algorithm on. However, simulation run alone with MONTE CARLO job executed really quick. Therefore, it missed the scaling observation period delay time and consequently, it missed the HPA replication trigger cycle and there was only 1 worker Pod instance working on jobs. This can be tune accordingly to the target threshold and CPU utilisation feedback control loop, however, it is still not a perfect solution. In addition of CPU utilisation, observing job queue metrics should be implemented for a better work load balancing.
+It is also found that auto-scaling based on observed CPU utilisation alone is not sufficient enough for ATHENA worker, due to the dynamic of how the simulation would run: \emph{simulation alone} or \emph{simulation + optimisation algorithm}. CPU utilisation scaling works better with optimisation algorithm on. However, simulation run alone with Monte Carlo job executed really quick. Therefore, it missed the scaling observation period delay time and consequently, it missed the HPA replication trigger cycle and there was only 1 worker Pod instance working on jobs. This can be tune accordingly to the target threshold and CPU utilisation feedback control loop, however, it is still not a perfect solution. In addition of CPU utilisation, observing job queue metrics should be implemented for a better work load balancing.
 
 Figure~\ref{fig:kubeAthenaArch} depicts the architectural view of ATHENA deployment with Kubernetes cluster. Docker Registry is a container image registry hosted using Nexus repository manager.
 
