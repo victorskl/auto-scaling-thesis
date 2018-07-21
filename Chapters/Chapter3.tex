@@ -11,7 +11,7 @@ This chapter discuss as the evolution of ATHENA deployment approaches, address t
 \centering
 \includegraphics[width=0.5\paperwidth]{Figures/ATHENA_deploy_stack}
 \decoRule
-\caption[ATHENA Deployment Stack]{ATHENA One Logical Deployment Stack}
+\caption[ATHENA Deployment Stack]{ATHENA Logical Deployment Stack}
 \label{fig:deployStack}
 \end{figure}
 
@@ -55,7 +55,7 @@ For a quick comparison, Chef\footnote{\url{https://www.chef.io}} and SaltStack\f
 
 \noindent \textbf{Vertical Scaling Issue:} \quad Furthermore, in the beginning, the whole ATHENA stack Figure~\ref{fig:deployStack} was deployed onto the single environment i.e. one VM instance. The pros with this approach is almost zero network latency among software components communication. But it needs a powerful machine. The highest flavour we can request on NeCTAR is \textit{m1.xxlarge: 16 cores, 64GB RAM}, although the real-world experience shows that this is somewhat difficult to get allocation from NeCTAR, which is understandable for a shared research facility. Most importantly, this approach has the potential vertical scaling limit as if requires more resources in one box.
 
-\noindent \textbf{Stateful and Stateless:} \quad The first step of scale out approach is to identify the \textbf{State} nature of the software stack and split between stateful and stateless components. In addition, the components are built into the docker images (i.e. dockerised) and run as containers. Figure~\ref{fig:deployDockerised} depicts the arrangement of this approach -- stateful database containers on \verb|db-server1| node and, pseudo-stateless API, stateless UI and Worker containers on another node. The scaling is a bit easier now. However, this is still a single node container scaling for the worker's Bag-of-Tasks remote job execution discussed in Chapter \ref{Chapter2}.
+\noindent \textbf{Stateful and Stateless:} \quad The first step of scale out approach is to identify the \textbf{State} nature of the software stack and split between stateful and stateless components. In addition, the components are built into the docker images (i.e. dockerised) and run as containers. Figure~\ref{fig:deployDockerised} depicts the arrangement of this approach -- stateful database containers on \verb|db-server| node and, pseudo-stateless API, stateless UI and Worker containers on another node. The scaling is a bit easier now. However, this is still a single node container scaling for the worker's Bag-of-Tasks remote job execution discussed in Chapter \ref{Chapter2}.
 
 \begin{small}
 \begin{lcverbatim}
@@ -82,7 +82,7 @@ docker-compose -f docker-compose.yaml -f staging.yaml  --project-name=stg \
 \label{fig:dedicatedWorkers}
 \end{figure}
 
-In fact, this dedicated workers approach is the recommended deployment for Production environment in the ATHENA Deployment Guide v1.0\parencite{athenaAllDoc}. It requires network and resources provisions as shown in Figure~\ref{fig:deployNetwork}. 
+In fact, this dedicated workers approach is the recommended deployment for Production environment in the ATHENA Deployment Guide v1.0 \parencite{athenaAllDoc}. It requires network and resource provision as shown in Figure~\ref{fig:deployNetwork}. 
 
 Note that, only ports 80 and 443 are exposed through the proxy-server to the external (public) network. The rest of the system resources form a trusted private network (subnet) among themselves and, is protected behind the firewall for all the ingress network traffic. The private network \verb|10.1.0.0/16| has setup and, a fixed static IP addressing is configured on each of the host systems. The host systems may have 2 NICs (network interface cards) typically eth0, eth1 and, have chosen 1 NIC for connecting this private internal network. The recommended network is Gigabit Ethernet (1GbE) or higher speed inter-network connection is assumed.
 
@@ -98,7 +98,7 @@ In this arrangement, we can horizontally scale out the system well. We can add m
 
 \section{Docker Swarm Mode}
 
-To this point, we have identified how we can scale the ATHENA system at different layers. However, the system operator still requires to configure and manage these computing resources manually. A good estimated time to add a new worker with the prepared IaC automation scripts; plus NeCTAR VM instance spin up time takes around 20 to 30 minutes. And the operator will have to spin down the instances where there no need of computation demands and keep the system in minimal operational state. This entails the need for self-managed Autonomic Computing \parencite{1160055} and the notion of autonomous cluster management and job execution platform from a pool of computing resources -- also refer as \textbf{Orchestrations} in a more recent deployment literature.
+To this point, we have identified how we can scale the ATHENA system at different layers. However, the system operator still requires to configure and manage these computing resources manually. A good estimated time to add a new worker with the prepared IaC automation scripts; plus NeCTAR VM instance spin up time takes around 20 to 30 minutes. And the operator will have to spin down the instances where there no need of computation demands and keep the system in minimal operational state. This entails the need for self-managed Autonomic Computing \parencite{1160055} and, the notion of autonomous cluster management and job execution platform from a pool of computing resources -- also refer as \textbf{Orchestrations} in a more recent deployment literature.
 
 Since we have containerised the entire ATHENA software components, the next best thing is to switch into docker swarm mode. Turning into the docker swarm mode is relatively straight forward. On the chosen node, initialize the manager (master) and add (swarm) worker nodes to form docker swarm cluster. Service scaling is easy, however, the scaling instruction need to manually set it on the swarm manager node through CLI or docker-compose stack deployment \verb|service.[srv_name].deploy.replicas:5| nomenclature.
 \begin{small}

@@ -4,7 +4,7 @@
 
 \section{Overview}
 
-This chapter focus on the critical review and details setup of Kubernetes (k8s or Kube) cluster for deploying the auto-scalable ATHENA system. The Kubernetes key components are introduced, however, a more details and complete reference left it to the k8s official documentation\parencite{kubeDoc}.
+This chapter focus on the critical review and details setup of Kubernetes (k8s or Kube) cluster for deploying the auto-scalable ATHENA system. The Kubernetes key components are introduced, however, a more details and complete reference left it to the k8s official documentation \parencite{kubeDoc}.
 
 With reference to the official website\footnote{\url{https://kubernetes.io}}, Kubernetes is the \emph{production grade container orchestration system that design for the deployment, scaling, management, and composition of application containers across clusters of hosts}. It is a robust container-management system that create a virtual abstraction layer on top of Cloud platform for deploying and maintaining scalable distributed systems. This abstraction enable users to deploy their applications consistently between different Cloud providers.
 
@@ -16,7 +16,7 @@ Kubernetes is the third incarnation of Google own container-management systems -
 
 \section{Looking at Kubernetes Design}
 \label{kubeDesign}
-From Borg-Omega to Kubernetes, the Google software engineers learned lessons\parencite{44843} on how best to tackle with the container-management at design\footnote{\url{https://kubernetes.io/blog/2015/06/the-distributed-system-toolkit-patterns/}} and, bring the architecture to next level\footnote{\url{https://kubernetes.io/blog/2016/06/container-design-patterns/}} to make it easy for developers to write the distributed applications and services that run in cloud and datacenter environments. Looking at Kubernetes, we can observe that the design of the system become more generic and abstraction compare to its predecessors. It goes beyond more than container-management. Since the process of containerisation encapsulates the application, Kubernetes introduces \textit{Application-Oriented Infrastructure} (AOI) with two motivations:
+From Borg-Omega to Kubernetes, the Google software engineers learned lessons \parencite{44843} on how best to tackle with the container-management at design\footnote{\url{https://kubernetes.io/blog/2015/06/the-distributed-system-toolkit-patterns/}} and, bring the architecture to next level\footnote{\url{https://kubernetes.io/blog/2016/06/container-design-patterns/}} to make it easy for developers to write the distributed applications and services that run in cloud and datacenter environments. Looking at Kubernetes, we can observe that the design of the system become more generic and abstraction compare to its predecessors. It goes beyond more than container-management. Since the process of containerisation encapsulates the application, Kubernetes introduces \textit{Application-Oriented Infrastructure} (AOI) with two motivations:
 \begin{itemize}
 \item abstracting away details of machine and operating system from application developer and deployment
 \item \emph{single application process per container} Design Pattern entails that managing containers mean managing applications, therefore, it shifts the Kube API from machine-oriented to application-oriented and, improves application deployment and introspection 
@@ -201,7 +201,7 @@ root@athena-kube-master1:~# kubeadm upgrade apply v1.10.2
 \label{fig:kubeadm}
 \end{figure}
 
-\noindent It is interesting to observe that at the basic bootstrapping for \textbf{a Kube Node} means a machine installed with \textbf{just kubelet component and container runtime engine}. After kubelet and Docker container runtime engine installed, up and and running as a \verb|systemd| daemon service, a Pod can be deployed. Therefore, Figure~\ref{fig:kubeadm} shows that api-server, controller-manager, scheduler, etcd components are running as Pods on a node with Master role; and similarly kube-proxy is running as Pod on both Master and Node roles.
+\noindent It is interesting to observe that at the basic bootstrapping for \textbf{a Kube Node} means a machine installed with \textbf{just kubelet component and container runtime engine}. After kubelet and Docker container runtime engine installed, up and running as a \verb|systemd| daemon service, a Pod can be deployed. Therefore, Figure~\ref{fig:kubeadm} shows that api-server, controller-manager, scheduler, etcd components are running as Pods on a node with Master role; and similarly kube-proxy is running as Pod on both Master and Node roles.
 
 Recall Table~\ref{kubeBuiltinResources} that a Pod is the built-in resource type (a \emph{kind}) and the basic unit of Kubernetes Object model. In this case, the kube-api-server, a GoLang application is containerised and deployed as a Pod. The \verb|kube-apiserver.yaml| manifests as follows.
 
@@ -320,7 +320,7 @@ root@athena-kube-n3:~# curl -s --user (scrap):(scrap) 10.101.72.108/api/version
 \end{lcverbatim}
 \end{small}
 
-\noindent Kubernetes offers few different possibilities -- \textbf{NodePort, LoadBalancer, HostNetwork, HostPort, Ingress} -- to expose the service endpoint to outside world, i.e. Public network. For production setup, cloude provider's LoadBalancer or Ingress\footnote{\url{https://kubernetes.io/docs/concepts/services-networking/ingress/}} should be used, however, on NeCTAR, every VM instances get Public IP address. In this case, setting up a simple HAProxy \textbf{Layer-4/Layer-7} routing deliver the similar effect.
+\noindent Kubernetes offers few different possibilities -- \textbf{NodePort, LoadBalancer, HostNetwork, HostPort, Ingress} -- to expose the service endpoint to outside world, i.e. Public network. For production setup, cloud provider's LoadBalancer or Ingress\footnote{\url{https://kubernetes.io/docs/concepts/services-networking/ingress/}} should be used, however, on NeCTAR, every VM instances get Public IP address. In this case, setting up a simple HAProxy \textbf{Layer-4/Layer-7} routing deliver the similar effect.
 
 \begin{small}
 \begin{lcverbatim}
@@ -664,7 +664,7 @@ Though Kubernetes is complex system to master thoroughly, when in operation, it 
 
 During the experimental runs, it is noticed that the auto-scaler doesn't react immediately to usage spikes. By default the metrics synchronisation happens once every 30 seconds and scaling up/down can only happen if there was no rescaling within the last 3-5 minutes. In this way, the HPA prevents rapid execution of conflicting decisions (oscillation). 
 
-It is also found that auto-scaling based on observed CPU utilisation alone is not sufficient enough for ATHENA worker, due to the dynamic of how the simulation would run: \emph{simulation alone} or \emph{simulation + optimisation algorithm}. CPU utilisation scaling works better with optimisation algorithm on. However, simulation run alone with Monte Carlo job executed really quick. Therefore, it missed the scaling observation period delay time and consequently, it missed the HPA replication trigger cycle and there was only 1 worker Pod instance working on jobs. This can be tune accordingly to the target threshold and CPU utilisation feedback control loop, however, it is still not a perfect solution. In addition of CPU utilisation, observing job queue metrics should be implemented for a better work load balancing.
+It is also found that auto-scaling based on observed CPU utilisation alone is not sufficient enough for ATHENA worker, due to the dynamic of how the simulation would run: \emph{simulation alone} or \emph{simulation + optimisation algorithm}. CPU utilisation scaling works better with optimisation algorithm on. However, simulation run alone with Monte Carlo job executed really quick. Therefore, it missed the scaling observation period delay time and consequently, it missed the HPA replication trigger cycle and there was only 1 worker Pod instance working on jobs. This can be tuned accordingly to the target threshold and CPU utilisation feedback control loop, however, it is still not a perfect solution. In addition of CPU utilisation, observing job queue metrics should be implemented for a better work load balancing.
 
 Figure~\ref{fig:kubeAthenaArch} depicts the architectural view of ATHENA deployment with Kubernetes cluster. Docker Registry is a container image registry hosted using Nexus repository manager.
 

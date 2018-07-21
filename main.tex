@@ -194,7 +194,7 @@ June 2018\\[0.4cm]
 \begin{itemize} 
 \item This thesis does not incorporate without acknowledgement any material previously submitted for a degree or diploma in any university; and that to the best of my knowledge and belief it does not contain any material previously published or written by another person where due reference is not made in the text.
 \item Where necessary I have received clearance for this research from the University's Ethics Committee and have submitted all required data to the Department.
-\item The thesis is 10844 words in length.\\ % (excluding text in images, table, bibliographies and appendices)
+\item The thesis is 10850 words in length.\\ % (excluding text in images, table, bibliographies and appendices)
 \end{itemize}
  
 \noindent Signed By:  \textit{San Kho Lin}
@@ -225,7 +225,7 @@ June 2018\\[0.4cm]
 
 ATHENA is a strategic discrete event simulation, optimisation and analysis system for manpower planning. It is state-of-the-art, purpose-built distributed application. It is containerised and deployed into Cloud platform using Docker technologies. It is a compute intensive application, especially when an optimisation algorithm is activated in simulation. Scaling and auto-scaling of an optimisation algorithm is the center of this thesis research.
 
-Infrastructure scaling on Cloud platform required provider specific API and technology. The containerisation deployment with Docker Swarm and Kubernetes technologies can scale across multi-clouds independently, without the need of Cloud Provider specific API.
+Infrastructure scaling on Cloud platform require provider specific API and technology. The containerisation deployment with Docker Swarm and Kubernetes technologies can scale across multi-clouds independently, without the need of Cloud Provider specific API.
 
 Auto-scaling system can not meet SLO and QoS by simply relying on CPU utilisation metrics alone. Most web and mobile applications require auto-scaling based on \textit{Requests Per Second} to handle traffic bursts and user load. With new \textbf{Custom Metrics API} feature introduced in Kubernetes, we can extend the API and expose ATHENA's metrics to Prometheus, then can be consumed by HPA controller and auto-scaled. For enterprise integration system like ATHENA, the auto-scaling could be triggered by the ActiveMQ job queue length exceeding some empirical threshold, therefore, \textbf{Threshold-based Reactive approach} with \textbf{Control Theory} auto-scaling technique can be explored.
 
