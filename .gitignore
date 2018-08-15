@@ -1,4 +1,7 @@
-*.pdf
+main.pdf
+main_guide.pdf
+Electron.pdf
+
 .idea
 *.iml
 

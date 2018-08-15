@@ -1,6 +1,13 @@
 # auto-scaling-thesis
 
-LaTeX
+### About
+
+The thesis title "**Auto-scaling an optimisation algorithm using Docker and Kubernetes on the NeCTAR Research Cloud**" is written for my masters dissertation at The University of Melbourne, under the supervision of [Prof. Richard Sinnott](https://cis.unimelb.edu.au/people/staff.php?person_ID=342078) and reviewer [Dr. William Voorsluys](https://cis.unimelb.edu.au/people/staff.php?person_ID=499273).
+
+You can read the thesis at [SanKhoLin_Autoscaling_Thesis.pdf](SanKhoLin_Autoscaling_Thesis.pdf).
+
+
+### Building with LaTeX
 
 - Install mactex distribution
 
