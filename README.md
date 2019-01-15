@@ -30,11 +30,38 @@ Retrieved from https://github.com/victorskl/auto-scaling-thesis.
 
 ### Citing as Published Paper
 
-Conference paper adaption of this auto-scaling thesis is accepted in *2018 IEEE/ACM International Conference on [Utility and Cloud Computing](http://ucc-conference.org) Companion (UCC Companion)*. It will be presented in First International Workshop on [Cloud-Native Applications Design and Experience](http://cnax.servicelaboratory.ch) (CNAX 2018). Paper is currently in-press. I will update citation reference in due course.
+Conference paper adaption of this auto-scaling thesis, title "**Auto-Scaling a Defence Application across the Cloud Using Docker and Kubernetes**" is accepted in *2018 IEEE/ACM International Conference on [Utility and Cloud Computing](http://ucc-conference.org) Companion (UCC Companion)*. It is presented in the *1st International Workshop on [Cloud-Native Applications Design and Experience](http://cnax.servicelaboratory.ch)* (CNAX 2018).
+
+Paper:
+- https://ieeexplore.ieee.org/document/8605800
+- https://ieeexplore-ieee-org.ezp.lib.unimelb.edu.au/document/8605800
+
+LaTeX/BibTeX:
 
 ```
-T.B.D
+@INPROCEEDINGS{8605800,
+author={S. Kho Lin and U. Altaf and G. Jayaputera and J. Li and D. Marques and D. Meggyesy and S. Sarwar and S. Sharma and W. Voorsluys and R. Sinnott and A. Novak and V. Nguyen and K. Pash},
+booktitle={2018 IEEE/ACM International Conference on Utility and Cloud Computing Companion (UCC Companion)},
+title={Auto-Scaling a Defence Application across the Cloud Using Docker and Kubernetes},
+year={2018},
+volume={},
+number={},
+pages={327-334},
+keywords={Containers;Cloud computing;Computational modeling;Training;Optimization;Helicopters;Virtualization;Auto-scaling;Container orchestration;Docker;Kubernetes;OpenStack},
+doi={10.1109/UCC-Companion.2018.00076},
+ISSN={},
+month={Dec},}
 ```
+
+Proceeding:
+- https://ieeexplore.ieee.org/xpl/mostRecentIssue.jsp?punumber=8605299
+- https://ieeexplore.ieee.org/xpl/mostRecentIssue.jsp?punumber=8603130
+- https://ieeexplore-ieee-org.ezp.lib.unimelb.edu.au/xpl/mostRecentIssue.jsp?punumber=8605299
+- https://ieeexplore-ieee-org.ezp.lib.unimelb.edu.au/xpl/mostRecentIssue.jsp?punumber=8603130
+- http://conferences.computer.org/ucc/2018/
+
+Blog:
+- https://blog.zhaw.ch/splab/2019/01/07/first-international-workshop-on-cloud-native-applications-design-and-experience-cnax-2018/
 
 ### Building with LaTeX
 
