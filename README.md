@@ -10,6 +10,11 @@ You can read the thesis at [SanKhoLin_Autoscaling_Thesis.pdf](SanKhoLin_Autoscal
 
 This auto-scaling thesis is prepared for the term project assessment of COMP90019 Distributed Computing Project 2018 SM1, The University of Melbourne. It still has room for improvement. You may wish to cite this work as follow.
 
+Using Zenodo DOI:
+
+[![DOI](https://zenodo.org/badge/136424769.svg)](https://zenodo.org/badge/latestdoi/136424769)
+
+
 LaTeX/BibTeX:
 ```
 @misc{sanl1autoscale,
